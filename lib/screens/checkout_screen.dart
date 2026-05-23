@@ -143,7 +143,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('${p.emoji} ${p.name} \u00D7$qty', style: const TextStyle(fontSize: 13, color: txt2)),
+                                Row(
+                                  children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(6),
+                                      child: SizedBox(
+                                        width: 28, height: 28,
+                                        child: Image.network(
+                                          p.imageUrl,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (_, __, ___) => Center(child: Text(p.emoji, style: const TextStyle(fontSize: 16))),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text('${p.name} \u00D7$qty', style: const TextStyle(fontSize: 13, color: txt2)),
+                                  ],
+                                ),
                                 Text(fmt(p.price * qty), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700)),
                               ],
                             ),

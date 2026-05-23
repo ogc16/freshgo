@@ -20,18 +20,18 @@ void main() {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
       ],
-      child: const FreshGoApp(),
+      child: const FoodApp(),
     ),
   );
 }
 
-class FreshGoApp extends StatelessWidget {
-  const FreshGoApp({super.key});
+class FoodApp extends StatelessWidget {
+  const FoodApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FreshGo',
+      title: 'FoodApp',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: false,
@@ -61,11 +61,12 @@ class _PhoneFrameState extends State<PhoneFrame> {
 
   void _navigate(String s) => setState(() => _screen = s);
 
-  void _handleLogin(String p) {
-    setState(() {
-      _phone = p;
-      _screen = 'otp';
-    });
+  void _handleLogin(String email) {
+    setState(() => _screen = 'home');
+  }
+
+  void _handleSignUp() {
+    setState(() => _screen = 'otp');
   }
 
   void _handleVerify() => setState(() => _screen = 'home');
@@ -79,7 +80,7 @@ class _PhoneFrameState extends State<PhoneFrame> {
     });
   }
 
-  bool get _isDarkTop => _screen == 'login' || _screen == 'otp' || _screen == 'home';
+  bool get _isDarkTop => _screen == 'login' || _screen == 'otp';
 
   @override
   Widget build(BuildContext context) {
@@ -142,7 +143,7 @@ class _PhoneFrameState extends State<PhoneFrame> {
               Container(
                 padding: const EdgeInsets.only(bottom: 8, top: 6),
                 decoration: BoxDecoration(
-                  color: _screen == 'login' ? green : Colors.white,
+                  color: _isDarkTop ? green : Colors.white,
                 ),
                 child: Center(
                   child: Container(
@@ -165,7 +166,7 @@ class _PhoneFrameState extends State<PhoneFrame> {
   Widget _buildScreen() {
     switch (_screen) {
       case 'login':
-        return LoginScreen(onLogin: _handleLogin);
+        return LoginScreen(onLogin: _handleLogin, onSignUp: _handleSignUp);
       case 'otp':
         return OtpScreen(phone: _phone, onVerify: _handleVerify, onBack: () => _navigate('login'));
       case 'home':
@@ -181,6 +182,6 @@ class _PhoneFrameState extends State<PhoneFrame> {
       case 'profile':
         return ProfileScreen(onNavigate: _navigate, onLogout: () => _navigate('login'));
     }
-    return LoginScreen(onLogin: _handleLogin);
+    return LoginScreen(onLogin: _handleLogin, onSignUp: _handleSignUp);
   }
 }

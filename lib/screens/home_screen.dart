@@ -300,6 +300,7 @@ class _ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = parseColor(product.bg);
     return Container(
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(rad),
@@ -313,13 +314,17 @@ class _ProductCard extends StatelessWidget {
         children: [
           Container(
             height: 100,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [bgColor, bgColor.withValues(alpha: 0.6)],
-                begin: Alignment.topLeft, end: Alignment.bottomRight,
-              ),
+            color: bgColor,
+            child: Image.network(
+              product.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+              errorBuilder: (_, __, ___) => Center(child: Text(product.emoji, style: const TextStyle(fontSize: 44))),
+              loadingBuilder: (_, child, progress) {
+                if (progress == null) return child;
+                return Center(child: CircularProgressIndicator(strokeWidth: 2, color: green));
+              },
             ),
-            child: Center(child: Text(product.emoji, style: const TextStyle(fontSize: 44))),
           ),
           Padding(
             padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
@@ -483,10 +488,17 @@ class _CartItemRow extends StatelessWidget {
       decoration: const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFF5F2EE), width: 0.5))),
       child: Row(
         children: [
-          Container(
-            width: 46, height: 46,
-            decoration: BoxDecoration(color: parseColor(p.bg), borderRadius: BorderRadius.circular(10)),
-            child: Center(child: Text(p.emoji, style: const TextStyle(fontSize: 28))),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 46, height: 46,
+              color: parseColor(p.bg),
+              child: Image.network(
+                p.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Center(child: Text(p.emoji, style: const TextStyle(fontSize: 28))),
+              ),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(

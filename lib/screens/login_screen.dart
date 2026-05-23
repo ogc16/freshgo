@@ -7,18 +7,23 @@ import '../widgets/ui.dart';
 
 class LoginScreen extends StatefulWidget {
   final ValueChanged<String> onLogin;
-  const LoginScreen({super.key, required this.onLogin});
+  final VoidCallback onSignUp;
+  const LoginScreen({super.key, required this.onLogin, this.onSignUp});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _phoneController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _rememberMe = false;
+  bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _phoneController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
   }
 
@@ -29,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           Container(
-            padding: const EdgeInsets.only(top: 52, bottom: 40, left: 24, right: 24),
+            padding: const EdgeInsets.only(top: 60, bottom: 40, left: 24, right: 24),
             decoration: const BoxDecoration(color: green),
             child: Stack(
               children: [
@@ -37,20 +42,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 Positioned(bottom: -30, left: -30, child: Container(width: 120, height: 120, decoration: const BoxDecoration(shape: BoxShape.circle, color: Color(0x26F5A100)))),
                 Column(
                   children: [
-                    const Text('\u{1F6D2}', style: TextStyle(fontSize: 62)),
+                    const Text('\u{1F37D}\u{FE0F}', style: TextStyle(fontSize: 64)),
                     const SizedBox(height: 14),
-                    RichText(
-                      text: TextSpan(
-                        style: const TextStyle(color: Colors.white, fontSize: 26, fontWeight: FontWeight.w800),
-                        children: [
-                          const TextSpan(text: 'Fresh'),
-                          const TextSpan(text: 'Go', style: TextStyle(color: amber)),
-                        ],
-                      ),
-                    ),
+                    const Text('FoodApp', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 8),
                     Text(
-                      '${tr('app.tagline', locale)}\n${tr('app.subtitle', locale)}',
+                      tr('login.tagline', locale),
                       textAlign: TextAlign.center,
                       style: TextStyle(color: Colors.white.withValues(alpha: 0.75), fontSize: 14, height: 1.5),
                     ),
@@ -68,102 +65,114 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(tr('login.phoneNumber', locale).toUpperCase(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: txt2, letterSpacing: 0.5)),
+                Text(tr('login.email', locale).toUpperCase(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: txt2, letterSpacing: 0.5)),
                 const SizedBox(height: 6),
                 FormInput(
-                  hintText: tr('login.phoneHint', locale),
-                  keyboardType: TextInputType.phone,
-                  controller: _phoneController,
-                  prefix: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                    decoration: BoxDecoration(border: Border.all(color: border), borderRadius: BorderRadius.circular(radButton), color: Colors.white),
-                    child: const Text('\u{1F1FA}\u{1F1EC} +256', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: txt)),
-                  ),
+                  hintText: tr('login.emailHint', locale),
+                  keyboardType: TextInputType.emailAddress,
+                  controller: _emailController,
                 ),
                 const SizedBox(height: 16),
-                PrimaryButton(
-                  text: tr('login.continueSms', locale),
-                  onPressed: () => widget.onLogin(_phoneController.text),
-                ),
-                _Divider(label: tr('login.orContinueWith', locale)),
-                _SocialButton(icon: 'G', label: tr('login.continueGoogle', locale), bg: Colors.white, border: const Color(0xFFE0DCD6), onTap: () => widget.onLogin('demo')),
-                const SizedBox(height: 10),
-                _SocialButton(icon: '\u{1F49B}', label: tr('login.continueMtn', locale), bg: const Color(0xFFFFF7E0), border: const Color(0xFFFBC02D), onTap: () => widget.onLogin('demo')),
-                const SizedBox(height: 10),
-                _SocialButton(icon: '\u{2764}\u{FE0F}', label: tr('login.continueAirtel', locale), bg: const Color(0xFFFFF0F0), border: const Color(0xFFEF5350), onTap: () => widget.onLogin('demo')),
-                const SizedBox(height: 12),
-                Text.rich(
-                  TextSpan(
-                    text: '${tr('login.terms', locale)} ',
-                    style: const TextStyle(fontSize: 12, color: txt3),
+                Text(tr('login.password', locale).toUpperCase(), style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: txt2, letterSpacing: 0.5)),
+                const SizedBox(height: 6),
+                Container(
+                  child: Row(
                     children: [
-                      TextSpan(text: tr('login.termsService', locale), style: const TextStyle(color: green, fontWeight: FontWeight.w600)),
-                      const TextSpan(text: ' & '),
-                      TextSpan(text: tr('login.privacyPolicy', locale), style: const TextStyle(color: green, fontWeight: FontWeight.w600)),
+                      Expanded(
+                        child: TextField(
+                          controller: _passwordController,
+                          obscureText: _obscurePassword,
+                          decoration: InputDecoration(
+                            hintText: tr('login.passwordHint', locale),
+                            hintStyle: const TextStyle(color: txt3, fontSize: 14),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(radButton),
+                              borderSide: const BorderSide(color: border),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(radButton),
+                              borderSide: const BorderSide(color: border),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(radButton),
+                              borderSide: const BorderSide(color: green, width: 1.5),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            isDense: true,
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          style: const TextStyle(fontSize: 15, color: txt),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      GestureDetector(
+                        onTap: () => setState(() => _obscurePassword = !_obscurePassword),
+                        child: Container(
+                          width: 44, height: 44,
+                          decoration: BoxDecoration(
+                            color: green3,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                              color: green, size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
-                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    GestureDetector(
+                      onTap: () => setState(() => _rememberMe = !_rememberMe),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Container(
+                            width: 20, height: 20,
+                            decoration: BoxDecoration(
+                              color: _rememberMe ? green : Colors.white,
+                              borderRadius: BorderRadius.circular(4),
+                              border: Border.all(color: _rememberMe ? green : border, width: 1.5),
+                            ),
+                            child: _rememberMe
+                                ? const Icon(Icons.check, size: 14, color: Colors.white)
+                                : null,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(tr('login.rememberMe', locale), style: const TextStyle(fontSize: 13, color: txt2)),
+                        ],
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {},
+                      child: Text(tr('login.forgotPassword', locale), style: const TextStyle(fontSize: 13, color: green, fontWeight: FontWeight.w600)),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 20),
-                LanguagePicker(),
+                PrimaryButton(text: tr('login.signIn', locale), onPressed: () => widget.onLogin(_emailController.text)),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('${tr('login.noAccount', locale)} ', style: const TextStyle(fontSize: 14, color: txt2)),
+                    GestureDetector(
+                      onTap: widget.onSignUp,
+                      child: Text(tr('login.signUp', locale), style: const TextStyle(fontSize: 14, color: green, fontWeight: FontWeight.w700)),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _Divider extends StatelessWidget {
-  final String label;
-  const _Divider({required this.label});
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: Row(
-        children: [
-          const Expanded(child: Divider(color: Color(0xFFE8E4DE), thickness: 1)),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Text(label, style: const TextStyle(fontSize: 13, color: txt3)),
-          ),
-          const Expanded(child: Divider(color: Color(0xFFE8E4DE), thickness: 1)),
-        ],
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final String icon;
-  final String label;
-  final Color bg;
-  final Color border;
-  final VoidCallback onTap;
-  const _SocialButton({required this.icon, required this.label, required this.bg, required this.border, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: OutlinedButton(
-        onPressed: onTap,
-        style: OutlinedButton.styleFrom(
-          backgroundColor: bg,
-          side: BorderSide(color: border, width: 1.5),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(radButton)),
-          padding: const EdgeInsets.symmetric(vertical: 13),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(icon, style: const TextStyle(fontSize: 16)),
-            const SizedBox(width: 10),
-            Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: txt)),
-          ],
-        ),
       ),
     );
   }
