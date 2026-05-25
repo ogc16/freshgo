@@ -1,6 +1,6 @@
 # FreshGo
 
-A mobile delivery app prototype for groceries, food, gas, and water — built for Kampala, Uganda. FreshGo simulates a complete e-commerce flow from login and product discovery to checkout, payment, and live order tracking.
+A mobile delivery app prototype for groceries, food, gas, and water — inspired by [Hercules](https://bites.onhercules.app/). FreshGo simulates a complete e-commerce flow from login and product discovery to checkout, payment, and live order tracking.
 
 ![Flutter](https://img.shields.io/badge/Flutter-3.41-02569B?logo=flutter)
 ![Dart](https://img.shields.io/badge/Dart-3.11-0175C2?logo=dart)
