@@ -13,6 +13,7 @@ A mobile delivery app prototype for groceries, food, gas, and water — built fo
 FreshGo is a Flutter prototype that delivers a realistic on-demand delivery experience tailored to the Ugandan market — with UGX pricing, local products (Matoke, Rolex, Muchomo), and mobile money login options. The app renders inside a simulated phone frame (390×844) with a status bar and home indicator to mimic a native mobile experience.
 
 ---
+<img width="273" height="623" alt="Screenshot 2026-05-10 160136" src="https://github.com/user-attachments/assets/89f363a3-3cfd-4878-9113-2254e69da20b" />
 
 ## Features
 
