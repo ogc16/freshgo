@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../i18n/strings.dart';
 import '../providers/locale_provider.dart';
 import '../providers/profile_provider.dart';
+import '../utils/admin.dart';
 import '../widgets/contact_sheet.dart';
 import '../widgets/ui.dart';
 import '../widgets/language_picker.dart';
@@ -270,6 +271,19 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
           _buildSection(locale, Icons.history_outlined, 'Orders & Rewards', _historyMenu(locale)),
           const SizedBox(height: 8),
           _buildSection(locale, Icons.support_outlined, 'Support & Feedback', _supportMenu(locale)),
+          if (isAdmin) ...[
+            const SizedBox(height: 8),
+            _buildSection(locale, Icons.admin_panel_settings_outlined, 'Admin', [
+              _MenuItemData(
+                icon: Icons.receipt_long_outlined,
+                label: 'All Orders',
+                sub: 'View & manage all customer orders',
+                bg: const Color(0xFFE8F5E9),
+                iconColor: green,
+                action: 'admin',
+              ),
+            ]),
+          ],
           const SizedBox(height: 16),
           const Divider(color: Color(0xFFE8E4DF)),
           const SizedBox(height: 12),
@@ -432,6 +446,7 @@ class _ProfileScreenState extends State<ProfileScreen> with SingleTickerProvider
         break;
       case 'orders':
       case 'loyalty':
+      case 'admin':
         widget.onNavigate(action);
         break;
       case 'help':

@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import '../models/product.dart';
 import '../utils/database_service.dart';
@@ -11,6 +10,8 @@ class Order {
   final List<String> items;
   final int count;
   final int total;
+  final int dbId;
+  final String userId;
 
   const Order({
     required this.id,
@@ -19,6 +20,8 @@ class Order {
     required this.items,
     required this.count,
     required this.total,
+    this.dbId = 0,
+    this.userId = '',
   });
 
   Map<String, dynamic> toMap() => {
@@ -30,20 +33,35 @@ class Order {
     'total': total,
   };
 
-  factory Order.fromMap(Map<String, dynamic> map, String id) => Order(
-    id: id,
-    date: (map['created_at'] as String?)?.split('T').first ?? '',
-    status: map['status'] as String? ?? 'delivered',
-    items: (map['items'] as List?)?.cast<String>() ?? [],
-    count: map['count'] as int? ?? 0,
-    total: map['total'] as int? ?? 0,
-  );
+  factory Order.fromMap(Map<String, dynamic> map, String id) {
+    final itemsRaw = map['items'];
+    List<String> itemList;
+    if (itemsRaw is List) {
+      itemList = itemsRaw.map((e) => e.toString()).toList();
+    } else {
+      itemList = [];
+    }
+    return Order(
+      id: id,
+      date: (map['created_at'] as String?)?.split('T').first ?? '',
+      status: map['status'] as String? ?? 'delivered',
+      items: itemList,
+      count: map['count'] as int? ?? 0,
+      total: map['total'] as int? ?? 0,
+      dbId: map['id'] as int? ?? 0,
+      userId: map['user_id'] as String? ?? '',
+    );
+  }
 }
 
 class OrderProvider extends ChangeNotifier {
   final List<Order> _orders = [];
+  final List<Order> _adminOrders = [];
+  bool _adminLoading = false;
 
   List<Order> get orders => List.unmodifiable(_orders);
+  List<Order> get adminOrders => List.unmodifiable(_adminOrders);
+  bool get adminLoading => _adminLoading;
 
   Future<void> loadFromSupabase() async {
     final user = supabase.auth.currentUser;
@@ -56,6 +74,33 @@ class OrderProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (_) {}
+  }
+
+  Future<void> loadAllOrders() async {
+    _adminLoading = true;
+    notifyListeners();
+    try {
+      final rows = await DatabaseService.getAllOrders();
+      _adminOrders.clear();
+      for (final row in rows) {
+        final dbId = row['id'];
+        final orderId = row['order_id'] as String? ?? dbId.toString();
+        _adminOrders.add(Order.fromMap(row, orderId));
+      }
+    } catch (e) {
+      debugPrint('Admin loadAllOrders error: $e');
+    }
+    _adminLoading = false;
+    notifyListeners();
+  }
+
+  Future<void> updateStatus(int dbId, String newStatus) async {
+    try {
+      await DatabaseService.updateOrderStatus(dbId, newStatus);
+      await loadAllOrders();
+    } catch (e) {
+      debugPrint('Admin updateStatus error: $e');
+    }
   }
 
   void addOrder(String id, List<MapEntry<Product, int>> cartItems, int total) {

@@ -23,4 +23,13 @@ class DatabaseService {
   static Future<void> createOrder(Map<String, dynamic> data) async {
     await supabase.from('orders').insert(data);
   }
+
+  static Future<List<Map<String, dynamic>>> getAllOrders() async {
+    final res = await supabase.from('orders').select().order('created_at', ascending: false);
+    return res;
+  }
+
+  static Future<void> updateOrderStatus(int dbId, String status) async {
+    await supabase.from('orders').update({'status': status}).eq('id', dbId);
+  }
 }

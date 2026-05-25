@@ -52,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final locale = context.watch<LocaleProvider>().locale;
     final pp = context.watch<ProductProvider>();
     cart.cacheFromProvider(pp);
+    final itemCount = cart.itemCount;
     final items = _filtered(pp);
     return Column(
       children: [
@@ -81,14 +82,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           shape: const CircleBorder(),
                         ),
                       ),
-                      if (cart.itemCount > 0)
+                      if (itemCount > 0)
                         Positioned(
                           right: 4, top: 4,
                           child: Container(
                             width: 18, height: 18,
                             decoration: const BoxDecoration(color: amber, shape: BoxShape.circle),
                             child: Center(
-                              child: Text('${cart.itemCount}',
+                              child: Text('$itemCount',
                                   style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700)),
                             ),
                           ),
@@ -393,6 +394,9 @@ class _CartOverlay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
+    final overlayItemCount = cart.itemCount;
+    final overlayCartItems = cart.cartItems;
+    final overlayCartTotal = cart.cartTotal;
     return GestureDetector(
       onTap: () => cart.closeCart(),
       child: Container(
@@ -425,9 +429,9 @@ class _CartOverlay extends StatelessWidget {
                             text: 'My Cart \u{1F6D2}',
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                             children: [
-                              if (cart.itemCount > 0)
+                              if (overlayItemCount > 0)
                                 TextSpan(
-                                  text: ' (${cart.itemCount} items)',
+                                  text: ' ($overlayItemCount items)',
                                   style: const TextStyle(fontSize: 13, color: txt3, fontWeight: FontWeight.w500),
                                 ),
                             ],
@@ -442,7 +446,7 @@ class _CartOverlay extends StatelessWidget {
                   ),
                   Divider(height: 1, color: borderLight),
                   Flexible(
-                    child: cart.cartItems.isEmpty
+                    child: overlayCartItems.isEmpty
                         ? const Padding(
                             padding: EdgeInsets.symmetric(vertical: 40, horizontal: 20),
                             child: Column(
@@ -458,14 +462,14 @@ class _CartOverlay extends StatelessWidget {
                         : ListView.builder(
                             shrinkWrap: true,
                             padding: const EdgeInsets.symmetric(horizontal: 16),
-                            itemCount: cart.cartItems.length,
+                            itemCount: overlayCartItems.length,
                             itemBuilder: (_, i) {
-                              final item = cart.cartItems[i];
+                              final item = overlayCartItems[i];
                               return _CartItemRow(item: item);
                             },
                           ),
                   ),
-                  if (cart.cartItems.isNotEmpty)
+                  if (overlayCartItems.isNotEmpty)
                     Container(
                       padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
                       child: Column(
@@ -474,7 +478,7 @@ class _CartOverlay extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text('Subtotal', style: TextStyle(fontSize: 14, color: txt2)),
-                              Text(fmt(cart.cartTotal), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: green)),
+                              Text(fmt(overlayCartTotal), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: green)),
                             ],
                           ),
                           const SizedBox(height: 6),

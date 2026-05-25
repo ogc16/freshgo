@@ -20,6 +20,7 @@ import 'screens/tracking_screen.dart';
 import 'screens/orders_screen.dart';
 import 'screens/profile_screen.dart';
 import 'screens/loyalty_screen.dart';
+import 'screens/admin_orders_screen.dart';
 import 'utils/supabase.dart';
 import 'widgets/ui.dart';
 
@@ -209,6 +210,8 @@ class _PhoneFrameState extends State<PhoneFrame> {
           context.read<AuthProvider>().signOut();
           setState(() => _screen = 'login');
         });
+      case 'admin':
+        return AdminOrdersScreen(onBack: () => _navigate('profile'));
     }
     return LoginScreen(onLogin: _handleLogin, onSignUp: _handleSignUp, onGuestLogin: _handleGuestLogin, onPhoneLogin: _handlePhoneLogin);
   }
