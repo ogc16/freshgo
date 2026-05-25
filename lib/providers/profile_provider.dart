@@ -1,5 +1,7 @@
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import '../utils/database_service.dart';
+import '../utils/storage_service.dart';
 import '../utils/supabase.dart';
 
 class ProfileProvider extends ChangeNotifier {
@@ -7,12 +9,14 @@ class ProfileProvider extends ChangeNotifier {
   String _phone = '';
   String _email = '';
   String _address = '';
+  String _avatarUrl = '';
   bool _saving = false;
 
   String get name => _name;
   String get phone => _phone;
   String get email => _email;
   String get address => _address;
+  String get avatarUrl => _avatarUrl;
   bool get saving => _saving;
 
   Future<void> loadFromSupabase() async {
@@ -24,6 +28,7 @@ class ProfileProvider extends ChangeNotifier {
       _phone = profile['phone'] as String? ?? _phone;
       _email = profile['email'] as String? ?? _email;
       _address = profile['address'] as String? ?? _address;
+      _avatarUrl = profile['avatar_url'] as String? ?? _avatarUrl;
       notifyListeners();
     }
   }
@@ -40,11 +45,22 @@ class ProfileProvider extends ChangeNotifier {
         'phone': _phone,
         'email': _email,
         'address': _address,
+        'avatar_url': _avatarUrl,
       });
     } finally {
       _saving = false;
       notifyListeners();
     }
+  }
+
+  Future<void> uploadAvatar(Uint8List bytes) async {
+    final user = supabase.auth.currentUser;
+    if (user == null) return;
+    final path = 'avatars/${user.id}.png';
+    final url = await StorageService.uploadImage(path, bytes);
+    _avatarUrl = url;
+    notifyListeners();
+    saveToSupabase();
   }
 
   void updateName(String v) { _name = v; notifyListeners(); }

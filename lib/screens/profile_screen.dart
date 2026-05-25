@@ -1,30 +1,33 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../i18n/strings.dart';
 import '../providers/locale_provider.dart';
 import '../providers/profile_provider.dart';
+import '../widgets/contact_sheet.dart';
 import '../widgets/ui.dart';
 import '../widgets/language_picker.dart';
 
-class MenuItem {
+class _MenuItemData {
   final String icon;
   final String label;
   final String sub;
   final Color bg;
-  final String? action;
-  const MenuItem({required this.icon, required this.label, required this.sub, required this.bg, this.action});
+  final String action;
+  const _MenuItemData({required this.icon, required this.label, required this.sub, required this.bg, required this.action});
 }
 
-List<MenuItem> _menuItems(String locale) => [
-  MenuItem(icon: '\u{1F464}', label: tr('profile.editProfile', locale), sub: tr('profile.editProfileSub', locale), bg: green3),
-  MenuItem(icon: '\u{1F4CD}', label: tr('profile.savedAddresses', locale), sub: tr('profile.savedAddressesSub', locale), bg: const Color(0xFFE3F2FD)),
-  MenuItem(icon: '\u{1F4B3}', label: tr('profile.paymentMethods', locale), sub: tr('profile.paymentMethodsSub', locale), bg: const Color(0xFFFFF3D6)),
-  MenuItem(icon: '\u{1F4E6}', label: tr('profile.orderHistory', locale), sub: tr('profile.orderHistorySub', locale), bg: const Color(0xFFF3E5F5), action: 'orders'),
-  MenuItem(icon: '\u{1F3C6}', label: 'Loyalty Program', sub: 'Earn points & view receipts', bg: const Color(0xFFFFF8E1), action: 'loyalty'),
-  MenuItem(icon: '\u{1F381}', label: tr('profile.offers', locale), sub: tr('profile.offersSub', locale), bg: const Color(0xFFFCE4EC)),
-  MenuItem(icon: '\u{1F514}', label: tr('profile.notifications', locale), sub: tr('profile.notificationsSub', locale), bg: const Color(0xFFFFF3E0)),
-  MenuItem(icon: '\u{1F4AC}', label: tr('profile.help', locale), sub: tr('profile.helpSub', locale), bg: green3),
-  MenuItem(icon: '\u{2B50}', label: tr('profile.rate', locale), sub: tr('profile.rateSub', locale), bg: const Color(0xFFFFFDE7)),
+List<_MenuItemData> _menuItems(String locale) => [
+  _MenuItemData(icon: '\u{1F464}', label: tr('profile.editProfile', locale), sub: tr('profile.editProfileSub', locale), bg: green3, action: 'edit'),
+  _MenuItemData(icon: '\u{1F4CD}', label: tr('profile.savedAddresses', locale), sub: tr('profile.savedAddressesSub', locale), bg: const Color(0xFFE3F2FD), action: 'addresses'),
+  _MenuItemData(icon: '\u{1F4B3}', label: tr('profile.paymentMethods', locale), sub: tr('profile.paymentMethodsSub', locale), bg: const Color(0xFFFFF3D6), action: 'payment'),
+  _MenuItemData(icon: '\u{1F4E6}', label: tr('profile.orderHistory', locale), sub: tr('profile.orderHistorySub', locale), bg: const Color(0xFFF3E5F5), action: 'orders'),
+  _MenuItemData(icon: '\u{1F3C6}', label: 'Loyalty Program', sub: 'Earn points & view receipts', bg: const Color(0xFFFFF8E1), action: 'loyalty'),
+  _MenuItemData(icon: '\u{1F381}', label: tr('profile.offers', locale), sub: tr('profile.offersSub', locale), bg: const Color(0xFFFCE4EC), action: 'offers'),
+  _MenuItemData(icon: '\u{1F514}', label: tr('profile.notifications', locale), sub: tr('profile.notificationsSub', locale), bg: const Color(0xFFFFF3E0), action: 'notifications'),
+  _MenuItemData(icon: '\u{1F4AC}', label: tr('profile.help', locale), sub: tr('profile.helpSub', locale), bg: green3, action: 'help'),
+  _MenuItemData(icon: '\u{2B50}', label: tr('profile.rate', locale), sub: tr('profile.rateSub', locale), bg: const Color(0xFFFFFDE7), action: 'rate'),
 ];
 
 class ProfileScreen extends StatefulWidget {
@@ -109,6 +112,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return result ?? false;
   }
 
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, maxWidth: 512, maxHeight: 512);
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    if (mounted) {
+      context.read<ProfileProvider>().uploadAvatar(bytes);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final locale = context.watch<LocaleProvider>().locale;
@@ -126,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Column(
                 children: [
                   GestureDetector(
-                    onTap: _editing ? null : () => setState(() => _editing = true),
+                    onTap: _editing ? _pickImage : () => setState(() => _editing = true),
                     child: Container(
                       width: 76, height: 76,
                       decoration: BoxDecoration(
@@ -134,10 +147,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: Colors.white.withValues(alpha: 0.18),
                         border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 3),
                       ),
-                      child: Center(
+                      child: ClipOval(
                         child: _editing
                           ? const Icon(Icons.camera_alt, color: Colors.white, size: 28)
-                          : const Text('\u{1F464}', style: TextStyle(fontSize: 34)),
+                          : profile.avatarUrl.isNotEmpty
+                              ? Image.network(profile.avatarUrl, fit: BoxFit.cover, width: 76, height: 76)
+                              : const Text('\u{1F464}', style: TextStyle(fontSize: 34)),
                       ),
                     ),
                   ),
@@ -249,15 +264,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildMenu(String locale, List<MenuItem> menu) {
+  void _handleMenuAction(String action) {
+    switch (action) {
+      case 'edit':
+        setState(() => _editing = true);
+        break;
+      case 'orders':
+      case 'loyalty':
+        widget.onNavigate(action);
+        break;
+      case 'help':
+        showContactSheet(context);
+        break;
+      case 'addresses':
+      case 'payment':
+      case 'offers':
+      case 'notifications':
+      case 'rate':
+        showComingSoon(context, _menuItems('')[_menuItems('').indexWhere((m) => m.action == action)].label);
+        break;
+    }
+  }
+
+  Widget _buildMenu(String locale, List<_MenuItemData> menu) {
     return ListView(
       children: [
-        GestureDetector(
-          onTap: () => setState(() => _editing = true),
-          child: _menuRow(menu[0], locale),
-        ),
-        ...menu.skip(1).map((item) => GestureDetector(
-          onTap: item.action != null ? () => widget.onNavigate(item.action!) : null,
+        ...menu.map((item) => GestureDetector(
+          onTap: () => _handleMenuAction(item.action),
           child: _menuRow(item, locale),
         )),
         const SizedBox(height: 16),
@@ -285,7 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _menuRow(MenuItem item, String locale) {
+  Widget _menuRow(_MenuItemData item, String locale) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 14),
       decoration: const BoxDecoration(

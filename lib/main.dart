@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'providers/cart_provider.dart';
 import 'providers/locale_provider.dart';
 import 'providers/loyalty_provider.dart';
+import 'providers/order_provider.dart';
 import 'providers/profile_provider.dart';
 import 'providers/auth_provider.dart';
 import 'screens/login_screen.dart';
@@ -32,6 +33,7 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => CartProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
         ChangeNotifierProvider(create: (_) => LoyaltyProvider()),
+        ChangeNotifierProvider(create: (_) => OrderProvider()),
         ChangeNotifierProvider(create: (_) => ProfileProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
@@ -135,9 +137,11 @@ class _PhoneFrameState extends State<PhoneFrame> {
 
   void _handlePlaceOrder() {
     final id = Random().nextInt(90000) + 10000;
+    final cart = context.read<CartProvider>();
+    context.read<OrderProvider>().addOrder(id.toString(), cart.cartItems, cart.cartTotal);
     setState(() {
       _orderId = id.toString();
-      context.read<CartProvider>().clearCart();
+      cart.clearCart();
       _screen = 'tracking';
     });
   }
@@ -149,7 +153,9 @@ class _PhoneFrameState extends State<PhoneFrame> {
     final auth = context.watch<AuthProvider>();
     if (auth.isAuthenticated && _screen == 'login') {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() => _screen = 'home');
+        if (!mounted) return;
+        context.read<OrderProvider>().loadFromSupabase();
+        setState(() => _screen = 'home');
       });
     }
     return AnnotatedRegion<SystemUiOverlayStyle>(
