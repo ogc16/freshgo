@@ -3,10 +3,10 @@ import '../utils/database_service.dart';
 import '../utils/supabase.dart';
 
 class ProfileProvider extends ChangeNotifier {
-  String _name = 'Namukasa Sarah';
-  String _phone = '+256 77X XXX XXX';
-  String _email = 'sarah@freshgo.com';
-  String _address = 'Kampala, Uganda';
+  String _name = '';
+  String _phone = '';
+  String _email = '';
+  String _address = '';
   bool _saving = false;
 
   String get name => _name;
