@@ -38,8 +38,23 @@ Future<void> main() async {
   );
 }
 
-class FoodApp extends StatelessWidget {
+class FoodApp extends StatefulWidget {
   const FoodApp({super.key});
+
+  @override
+  State<FoodApp> createState() => _FoodAppState();
+}
+
+class _FoodAppState extends State<FoodApp> {
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showSplash = false);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +70,21 @@ class FoodApp extends StatelessWidget {
           secondary: amber,
         ),
       ),
-      home: const PhoneFrame(),
+      home: _showSplash
+          ? const Scaffold(
+              backgroundColor: green,
+              body: Center(
+                child: Text(
+                  'freshgo',
+                  style: TextStyle(
+                    fontSize: 48,
+                    fontWeight: FontWeight.bold,
+                    color: amber,
+                  ),
+                ),
+              ),
+            )
+          : const PhoneFrame(),
     );
   }
 }
