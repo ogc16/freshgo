@@ -74,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     children: [
                       const Text('\u{1F37D}\u{FE0F}', style: TextStyle(fontSize: 64)),
                       const SizedBox(height: 14),
-                      const Text('FoodApp', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
+                      const Text('FreshGo', style: TextStyle(color: Colors.white, fontSize: 30, fontWeight: FontWeight.w800)),
                       const SizedBox(height: 8),
                       Text(
                         tr('login.tagline', locale),

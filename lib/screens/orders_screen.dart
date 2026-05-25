@@ -6,10 +6,7 @@ import '../utils/formatters.dart';
 import '../widgets/ui.dart';
 
 const _orders = [
-  {'id': 'FG-38219', 'date': 'Today, 2:14 PM', 'status': 'transit', 'items': ['\u{1F345}', '\u{1F35A}', '\u{1F4A7}'], 'count': 3, 'total': 34000},
-  {'id': 'FG-37104', 'date': 'Yesterday, 11:30 AM', 'status': 'delivered', 'items': ['\u{1F35B}', '\u{1F966}', '\u{1F534}'], 'count': 5, 'total': 118000},
-  {'id': 'FG-36881', 'date': 'Apr 22, 9:00 AM', 'status': 'delivered', 'items': ['\u{1F4A7}', '\u{1F9C5}', '\u{1F35E}'], 'count': 4, 'total': 28000},
-  {'id': 'FG-36102', 'date': 'Apr 19, 7:30 PM', 'status': 'delivered', 'items': ['\u{1F95A}', '\u{1FAF9}', '\u{1F34C}'], 'count': 6, 'total': 46000},
+  {'id': '', 'date': '', 'status': '', 'items': ['', '', ''], 'count': 0, 'total': 0},
 ];
 
 class OrdersScreen extends StatelessWidget {

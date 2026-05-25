@@ -1,5 +1,5 @@
-name: freshgo_app
-description: "FreshGo - Groceries, Food, Gas & Water delivery in Kampala"
+name: freshgo
+description: "FreshGo - Groceries, Food, Gas & Water delivery "
 publish_to: 'none'
 version: 1.0.0+1
 

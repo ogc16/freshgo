@@ -78,8 +78,8 @@ FreshGo is a Flutter prototype that delivers a realistic on-demand delivery expe
 
 ```bash
 # Clone the repository
-git clone <repo-url>
-cd freshgo-app
+git clone https://github.com/ogc16/freshgo
+cd freshgo
 
 # Install dependencies
 flutter pub get

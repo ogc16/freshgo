@@ -20,11 +20,16 @@ class AuthProvider extends ChangeNotifier {
     try {
       _user = supabase.auth.currentUser;
       if (_user != null) _status = AuthStatus.authenticated;
-      _authSub = supabase.auth.onAuthStateChange.listen((data) {
-        _user = data.session?.user;
-        _status = _user != null ? AuthStatus.authenticated : AuthStatus.unauthenticated;
-        notifyListeners();
-      });
+    } catch (_) {}
+    try {
+      _authSub = supabase.auth.onAuthStateChange.listen(
+        (data) {
+          _user = data.session?.user;
+          _status = _user != null ? AuthStatus.authenticated : AuthStatus.unauthenticated;
+          notifyListeners();
+        },
+        onError: (_) {},
+      );
     } catch (_) {}
   }
 
